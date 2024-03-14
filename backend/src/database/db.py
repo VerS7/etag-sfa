@@ -1,7 +1,7 @@
 """
 Database
 """
-from backend.src.constants import DATABASE_URL
+from backend.src.constants import DB_CONN
 
 from sqlmodel import SQLModel
 
@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 
-engine = create_async_engine(DATABASE_URL, echo=False, future=True)
+engine = create_async_engine(DB_CONN, echo=False, future=True)
 
 
 async def init_database() -> None:
