@@ -1,52 +1,39 @@
 """
 Auth views
 """
-from typing import Annotated
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.security import HTTPBasicCredentials
 
 from backend.src.database.db import get_session
 from backend.src.models.user import User
-from .security import get_user, password_check, verify_admin, create_user
+from . import crud
+from .security import auth_credentials
 
 
 router = APIRouter(tags=["User auth"])
-security = HTTPBasic()
 
 
-unauth_exception = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="Invalid username or password!",
-    headers={"WWW-Authenticate": "basic"}
-)
-
-
-@router.get("/login", status_code=status.HTTP_200_OK)
-async def auth_credentials(credentials: Annotated[HTTPBasicCredentials, Depends(security)],
-                           session: AsyncSession = Depends(get_session)):
-    """Auth by username and password"""
-    user = await get_user(session, credentials.username)
-    if user and password_check(user.hashed_password, credentials.password):
-        return status.HTTP_200_OK
-    raise unauth_exception
+@router.get("/login", response_model=User)
+async def login(user: User = Depends(auth_credentials)):
+    """Login user"""
+    return user
 
 
 @router.post("/register", response_model=User)
-async def register_user(credentials: Annotated[HTTPBasicCredentials, Depends(security)],
-                        user_to_register: HTTPBasicCredentials,
+async def register_user(user_to_register: HTTPBasicCredentials,
+                        credentials: User = Depends(auth_credentials),
                         session: AsyncSession = Depends(get_session)) -> User:
     """Register user. Only admin can register new users"""
-    if not verify_admin(credentials):
-        raise unauth_exception
+    if not credentials.role == "admin":
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                            detail="User without admin role can't create other users!")
 
-    created_user = await create_user(session, user_to_register)
-
-    if not created_user:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User with this username already exists!")
+    try:
+        created_user = await crud.add_user(session, user_to_register)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                            detail="User with this username already exists!")
 
     return created_user
-
-
