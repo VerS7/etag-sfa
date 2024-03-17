@@ -2,6 +2,7 @@
 Database
 """
 from backend.src.constants import DB_CONN
+from backend.src.admin import init_admin
 
 from sqlmodel import SQLModel
 
@@ -16,6 +17,9 @@ async def init_database() -> None:
     """Initialise db"""
     async with engine.begin() as connection:
         await connection.run_sync(SQLModel.metadata.create_all)
+
+    async with async_sessionmaker(engine, class_=AsyncSession)() as session:
+        await init_admin(session)
 
 
 async def get_session() -> AsyncSession:
