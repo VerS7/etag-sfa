@@ -10,7 +10,7 @@ from sqlmodel import select
 
 from fastapi.security import HTTPBasicCredentials
 
-from .crypto import hash_password
+from backend.src.crypto import hash_password
 from backend.src.models.user import User
 
 

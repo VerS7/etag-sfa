@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBasicCredentials, HTTPBasic
 
-from .crypto import hash_password
+from backend.src.crypto import hash_password
 from .crud import get_user
 from backend.src.models.user import User
 from backend.src.database.db import get_session
