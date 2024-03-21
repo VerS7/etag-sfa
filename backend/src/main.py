@@ -12,7 +12,8 @@ from fastapi.requests import Request
 from database.db import init_database
 
 from products.views import router as product_router
-from auth.views import router as user_auth_router
+from user_auth.views import router as user_auth_router
+from token_auth.views import router as token_auth_router
 
 
 @asynccontextmanager
@@ -25,6 +26,7 @@ app = FastAPI(lifespan=lifespan)
 api_router = APIRouter(prefix="/api")
 api_router.include_router(product_router)
 api_router.include_router(user_auth_router)
+api_router.include_router(token_auth_router)
 
 app.include_router(api_router)
 
