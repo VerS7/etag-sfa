@@ -1,5 +1,5 @@
 """
-User user_auth logic
+User logic
 """
 from typing import Annotated
 from secrets import compare_digest
