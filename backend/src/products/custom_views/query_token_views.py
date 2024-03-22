@@ -9,7 +9,7 @@ from backend.src.database.db import get_session
 from backend.src.token_auth.security import token_auth
 
 from .. import crud
-from ..schemas import Product
+from ..schemas import Product, ProductCreate
 
 
 router = APIRouter(dependencies=[Depends(token_auth)])
@@ -29,3 +29,9 @@ async def get_product(product_id: int,
     if product is not None:
         return product
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
+
+
+@router.post("/{token}", response_model=Product, status_code=status.HTTP_201_CREATED)
+async def create_product(product: ProductCreate, session: AsyncSession = Depends(get_session)):
+    """create product endpoint"""
+    return await crud.add_product(session, product)
