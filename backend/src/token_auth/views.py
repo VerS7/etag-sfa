@@ -12,7 +12,7 @@ from backend.src.user_auth.security import auth_credentials
 
 from . import crud
 
-router = APIRouter(prefix="/token", tags=["Token auth"])
+router = APIRouter(prefix="/token", tags=["Token auth"], dependencies=[Depends(auth_credentials)])
 
 
 @router.post("/", response_model=AuthToken)
@@ -34,8 +34,7 @@ async def create_token(token_name: str,
 
 
 @router.get("/", response_model=list[AuthToken])
-async def get_tokens(credentials: User = Depends(auth_credentials),
-                     session: AsyncSession = Depends(get_session)):
+async def get_tokens(session: AsyncSession = Depends(get_session)):
     """Get all tokens endpoint"""
     tokens = await crud.get_tokens(session)
     if len(tokens) == 0:
@@ -46,7 +45,6 @@ async def get_tokens(credentials: User = Depends(auth_credentials),
 
 @router.get("/{name}", response_model=AuthToken)
 async def get_token(name: str,
-                    credentials: User = Depends(auth_credentials),
                     session: AsyncSession = Depends(get_session)):
     """Get token by name endpoint"""
     token = await crud.get_token(session, name)
