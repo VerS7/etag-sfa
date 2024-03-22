@@ -12,6 +12,7 @@ class Product(SQLModel, table=True):
     id: int = Field(primary_key=True, index=True)
     name: str = Field()
     price: Decimal = Field()
+    barcode: str = Field()
     sale_price: Decimal | None = Field(default=None)
     category: str | None = Field(nullable=True)
     subcategory: str | None = Field(nullable=True)

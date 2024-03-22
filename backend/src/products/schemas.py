@@ -9,6 +9,7 @@ from pydantic import BaseModel
 class ProductBase(BaseModel):
     """Base product schema"""
     name: str
+    barcode: str
     price: Decimal
     sale_price: Decimal | None
     category: str | None
@@ -33,6 +34,7 @@ class ProductUpdatePartial(ProductBase):
     """Partial update product schema"""
     name: str | None
     price: str | None
+    barcode: str | None
 
 
 class Product(ProductBase):
