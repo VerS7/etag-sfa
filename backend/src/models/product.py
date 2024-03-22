@@ -8,6 +8,7 @@ from sqlmodel import SQLModel, Field
 
 class Product(SQLModel, table=True):
     """Product model"""
+    __tablename__ = "products"
     id: int = Field(primary_key=True, index=True)
     name: str = Field()
     price: Decimal = Field()
