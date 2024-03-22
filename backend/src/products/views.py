@@ -33,7 +33,7 @@ async def get_product(product_id: int, session: AsyncSession = Depends(get_sessi
     product = await crud.get_product(session, product_id)
     if product is not None:
         return product
-    raise HTTPException(status_code=404, detail="Item not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
 
 
 @router.get("/{token}", response_model=list[Product])
@@ -51,7 +51,7 @@ async def get_product(product_id: int,
     product = await crud.get_product(session, product_id)
     if product is not None:
         return product
-    raise HTTPException(status_code=404, detail="Item not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
 
 
 @router.post("/", response_model=Product, status_code=status.HTTP_201_CREATED)
@@ -75,7 +75,7 @@ async def update_product_partial(product_id: int,
             product_update,
             partial=True
         )
-    return HTTPException(status_code=404, detail="Item not found")
+    return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
 
 
 @router.delete("/{product_id}/", status_code=status.HTTP_204_NO_CONTENT)
@@ -86,4 +86,4 @@ async def delete_product(product_id: int,
     product = await crud.get_product(session, product_id)
     if product is not None:
         return await crud.delete_product(session, product)
-    return HTTPException(status_code=404, detail="Item not found")
+    return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")

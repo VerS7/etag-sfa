@@ -39,7 +39,7 @@ async def get_tokens(credentials: User = Depends(auth_credentials),
     """Get all tokens endpoint"""
     tokens = await crud.get_tokens(session)
     if len(tokens) == 0:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Tokens not found!")
     return tokens
 
@@ -51,6 +51,6 @@ async def get_token(name: str,
     """Get token by name endpoint"""
     token = await crud.get_token(session, name)
     if token is None:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Token with this name not found!")
     return token
