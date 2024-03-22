@@ -43,7 +43,7 @@ async def add_user(session: AsyncSession, user: HTTPBasicCredentials) -> User:
 
 
 async def update_user(session: AsyncSession, user: User, user_update: HTTPBasicCredentials) -> User:
-    """update product"""
+    """update user"""
     pass
 
 
