@@ -1,5 +1,5 @@
 """
-Product custom_views
+Product query token access views
 """
 from fastapi import APIRouter, HTTPException, status, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
