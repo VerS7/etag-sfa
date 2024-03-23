@@ -1,12 +1,12 @@
 """
 Product custom_views
 """
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.src.database.db import get_session
-
 from backend.src.token_auth.security import token_auth
+from backend.src.image.generating import generate_image
 
 from .. import crud
 from ..schemas import Product, ProductCreate
@@ -35,3 +35,15 @@ async def get_product(product_id: int,
 async def create_product(product: ProductCreate, session: AsyncSession = Depends(get_session)):
     """create product endpoint"""
     return await crud.add_product(session, product)
+
+
+@router.get("/{token}/{product_id}/", response_class=Response)
+async def get_product_image(product_id: int, session: AsyncSession = Depends(get_session)):
+    """Returns product image bytes by id"""
+    product = await crud.get_product(session, product_id)
+
+    if product is not None:
+        return Response(content=await generate_image("default", product), media_type="image/png")
+
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                        detail="Product not found!")
