@@ -53,7 +53,7 @@ async def delete_product(product_id: int,
     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
 
 
-@router.get("/{product_id}/", response_class=Response)
+@router.get("/image/{product_id}/", response_class=Response)
 async def get_product_image(product_id: int, session: AsyncSession = Depends(get_session)):
     """Returns product image bytes by id"""
     product = await crud.get_product(session, product_id)

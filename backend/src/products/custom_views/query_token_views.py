@@ -37,7 +37,7 @@ async def create_product(product: ProductCreate, session: AsyncSession = Depends
     return await crud.add_product(session, product)
 
 
-@router.get("/{token}/{product_id}/", response_class=Response)
+@router.get("/image/{token}/{product_id}/", response_class=Response)
 async def get_product_image(product_id: int, session: AsyncSession = Depends(get_session)):
     """Returns product image bytes by id"""
     product = await crud.get_product(session, product_id)
