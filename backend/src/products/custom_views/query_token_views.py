@@ -2,6 +2,9 @@
 Product query token access views
 """
 from fastapi import APIRouter, HTTPException, status, Depends, Response
+
+from fastapi_pagination import Page, paginate
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.src.database.db import get_session
@@ -15,10 +18,10 @@ from ..schemas import Product, ProductCreate
 router = APIRouter(dependencies=[Depends(token_auth)])
 
 
-@router.get("/{token}", response_model=list[Product])
+@router.get("/{token}", response_model=Page[Product])
 async def get_products(session: AsyncSession = Depends(get_session)):
-    """get all products endpoint"""
-    return await crud.get_products(session)
+    """get paginated products endpoint"""
+    return paginate(await crud.get_products(session))
 
 
 @router.get("/{token}/{product_id}/", response_model=Product)

@@ -2,7 +2,10 @@
 Product user access views
 """
 from fastapi import APIRouter, HTTPException, status, Depends, Response
+
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from fastapi_pagination import Page, paginate
 
 from backend.src.database.db import get_session
 from backend.src.user_auth.security import auth_credentials
@@ -15,10 +18,10 @@ from ..schemas import Product, ProductCreate, ProductUpdatePartial
 router = APIRouter(dependencies=[Depends(auth_credentials)])
 
 
-@router.get("/", response_model=list[Product])
+@router.get("/", response_model=Page[Product])
 async def get_products(session: AsyncSession = Depends(get_session)):
-    """get all products endpoint"""
-    return await crud.get_products(session)
+    """get paginated products endpoint"""
+    return paginate(await crud.get_products(session))
 
 
 @router.post("/", response_model=Product, status_code=status.HTTP_201_CREATED)

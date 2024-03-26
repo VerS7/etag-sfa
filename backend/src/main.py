@@ -9,6 +9,9 @@ from fastapi import FastAPI, staticfiles, APIRouter
 from fastapi.responses import RedirectResponse
 from fastapi.requests import Request
 
+from fastapi_pagination import add_pagination
+from fastapi_pagination.utils import disable_installed_extensions_check
+
 from database.db import init_database
 
 from products.views import router as product_router
@@ -29,6 +32,9 @@ api_router.include_router(user_auth_router)
 api_router.include_router(token_auth_router)
 
 app.include_router(api_router)
+
+add_pagination(app)
+disable_installed_extensions_check()
 
 # Test frontend
 # ---------------------
