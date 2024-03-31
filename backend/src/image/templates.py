@@ -8,6 +8,8 @@ from PIL import Image, ImageFont, ImageDraw
 
 from backend.src.models.product import Product
 
+from .utils import validate_img_size, validate_img_scale, draw_justified_text
+
 
 class BaseImageTemplate(ABC, metaclass=ABCMeta):
     """Base image generating template"""
@@ -23,26 +25,71 @@ class BaseImageTemplate(ABC, metaclass=ABCMeta):
 class DefaultImage(BaseImageTemplate):
     def __init__(self, data: Product):
         super().__init__(data)
-        self.product_name_font = ImageFont.truetype("calibri", 20)
-        self.company_name_font = ImageFont.truetype("calibri", 12)
-        self.price_font = ImageFont.truetype("calibri", 50)
-        self.info_font = ImageFont.truetype("calibri", 10)
+        self.bg_image = Image.open("image/assets/default/default.png")
+        self.font = "image/assets/default/tahoma.ttf"
+        self.bold_font = "image/assets/default/tahoma_bold.ttf"
 
-    async def generate_image(self, size: tuple[int, int] | None = None, scale: float | None = None) -> bytes:
-        if size is not None and size[0] <= 0 and size[1] <= 0:
+        self.text_color = (0, 0, 0)
+
+        self.product_name_font = ImageFont.truetype(self.bold_font, 45)
+        self.price_font = ImageFont.truetype(self.bold_font, 120)
+        self.info_font = ImageFont.truetype(self.bold_font, 40)
+        self.sub_info_font = ImageFont.truetype(self.bold_font, 20)
+
+    async def generate_image(self, size: str | None = None, scale: float | None = None) -> bytes:
+        """Generate image bytes from data with optional size and scale"""
+        if size is not None and not validate_img_size(size):
             raise ValueError("Incorrect size.")
 
-        color = (0, 0, 0)
-        img = Image.open("image/assets/default.png")
-        draw = ImageDraw.Draw(img)
+        if scale is not None and not validate_img_scale(scale):
+            raise ValueError("Incorrect scale.")
 
-        draw.text(text=self.data.name, font=self.product_name_font, xy=(10, 40), fill=color)
-        draw.text(text=str(self.data.price), font=self.price_font, xy=(75, 80), fill=color)
+        draw = ImageDraw.Draw(self.bg_image)
+        # Единица измерения
+        draw.text(text=f"{self.data.price:.2f}",
+                  font=self.price_font,
+                  xy=(self.bg_image.size[0] / 2, 450),
+                  fill=self.text_color,
+                  anchor="mm")
+        # Цена продукта
+        draw.text(text=f"{self.data.unit if '.' in self.data.unit else f'{self.data.unit}.'}",
+                  font=self.info_font,
+                  xy=(90, 335),
+                  fill=self.text_color,
+                  anchor="mm")
+        # Страна
+        draw.text(text=self.data.producer_country,
+                  font=self.info_font,
+                  xy=(535, 560),
+                  fill=self.text_color,
+                  anchor="rm")
+        # Наименование продукта
+        draw_justified_text(draw,
+                            text=self.data.name,
+                            font=self.product_name_font,
+                            xy=(int(self.bg_image.size[0] / 2), 150),
+                            fill=self.text_color,
+                            anchor="mm",
+                            line_width=17)
+        # Производитель
+        draw_justified_text(draw,
+                            text=self.data.producer,
+                            font=self.sub_info_font,
+                            xy=(15, 565),
+                            fill=self.text_color,
+                            anchor="lm",
+                            line_width=25,
+                            margin=5,
+                            reverse=True)
 
         if size is not None:
-            img.resize(size)
+            self.bg_image = self.bg_image.resize((int(size.split("x")[0]), int(size.split("x")[1])))
+
+        if scale is not None:
+            self.bg_image = \
+                self.bg_image.resize((int(self.bg_image.size[0] * scale), int(self.bg_image.size[1] * scale)))
 
         img_bytes = BytesIO()
-        img.save(img_bytes, format=img.format)
+        self.bg_image.save(img_bytes, format="png")
 
         return img_bytes.getvalue()
