@@ -15,7 +15,7 @@ from .. import crud
 from ..schemas import Product, ProductCreate
 
 
-router = APIRouter(dependencies=[Depends(token_auth)])
+router = APIRouter(dependencies=[Depends(token_auth)], tags=["Token Access"])
 
 
 @router.get("/{token}", response_model=Page[Product])

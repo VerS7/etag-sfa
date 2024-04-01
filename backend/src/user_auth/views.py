@@ -12,7 +12,7 @@ from . import crud
 from .security import auth_credentials
 
 
-router = APIRouter(tags=["User auth"])
+router = APIRouter(tags=["User Auth"])
 
 
 @router.get("/login", response_model=User)

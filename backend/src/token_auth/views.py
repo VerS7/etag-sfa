@@ -12,7 +12,7 @@ from backend.src.user_auth.security import auth_credentials
 
 from . import crud
 
-router = APIRouter(prefix="/token", tags=["Token auth"], dependencies=[Depends(auth_credentials)])
+router = APIRouter(prefix="/token", tags=["Token Auth"], dependencies=[Depends(auth_credentials)])
 
 
 @router.post("/", response_model=AuthToken)

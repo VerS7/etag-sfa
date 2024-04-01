@@ -15,7 +15,7 @@ from .. import crud
 from ..schemas import Product, ProductCreate, ProductUpdatePartial
 
 
-router = APIRouter(dependencies=[Depends(auth_credentials)])
+router = APIRouter(dependencies=[Depends(auth_credentials)], tags=["User Access"])
 
 
 @router.get("/", response_model=Page[Product])
