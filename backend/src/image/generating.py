@@ -7,7 +7,7 @@ from .templates import DefaultImage
 
 
 TEMPLATES = {
-    "default": DefaultImage
+    "default": DefaultImage()
 }
 
 
@@ -20,4 +20,4 @@ async def generate_image(template: str, data: Product, **kwargs) -> bytes:
     size = kwargs.get("size", None)
     scale = kwargs.get("scale", None)
 
-    return await template_(data).generate_image(size=size, scale=scale)
+    return await template_.generate_image(data=data, size=size, scale=scale)
