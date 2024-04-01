@@ -5,9 +5,7 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 
-from fastapi import FastAPI, staticfiles, APIRouter
-from fastapi.responses import RedirectResponse
-from fastapi.requests import Request
+from fastapi import FastAPI, APIRouter
 
 from fastapi_pagination import add_pagination
 from fastapi_pagination.utils import disable_installed_extensions_check
@@ -35,25 +33,6 @@ app.include_router(api_router)
 
 add_pagination(app)
 disable_installed_extensions_check()
-
-# Test frontend
-# ---------------------
-app.mount("/home", staticfiles.StaticFiles(directory="../../frontend/dist"), name="home")
-app.mount("/assets", staticfiles.StaticFiles(directory="../../frontend/dist/assets"), name="assets")
-
-
-@app.get("/")
-def homepage(request: Request):
-    return RedirectResponse("/home/index.html")
-# ---------------------
-
-
-# Test endpoint
-# ---------------------
-@app.get("/test")
-async def api_test():
-    return {"test": "Test Complete!"}
-# ---------------------
 
 
 if __name__ == '__main__':
