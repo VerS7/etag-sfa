@@ -2,6 +2,7 @@
 Product schemas
 """
 from decimal import Decimal
+from datetime import datetime
 
 from pydantic import BaseModel
 
@@ -40,3 +41,5 @@ class ProductUpdatePartial(ProductBase):
 class Product(ProductBase):
     """Product schema"""
     id: int
+    created_at: datetime
+    updated_at: None | datetime
