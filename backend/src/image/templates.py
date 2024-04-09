@@ -21,9 +21,9 @@ class BaseImageTemplate(ABC, metaclass=ABCMeta):
 
 class DefaultImage(BaseImageTemplate):
     def __init__(self):
-        self.bg_image = "image/assets/default/default.png"
-        self.font = "image/assets/default/tahoma.ttf"
-        self.bold_font = "image/assets/default/tahoma_bold.ttf"
+        self.bg_image = "backend/src/image/assets/default/default.png"
+        self.font = "backend/src/image/assets/default/tahoma.ttf"
+        self.bold_font = "backend/src/image/assets/default/tahoma_bold.ttf"
 
         self.text_color = (0, 0, 0)
 

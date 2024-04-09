@@ -7,7 +7,7 @@ from sqlmodel import select
 
 from backend.src.crypto import hash_password
 from backend.src.models.user import User
-from constants import ADMIN_USERNAME, ADMIN_PASSWORD
+from backend.src.constants import ADMIN_USERNAME, ADMIN_PASSWORD
 
 
 async def init_admin(session: AsyncSession) -> None:
