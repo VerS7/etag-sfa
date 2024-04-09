@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 
 from fastapi import FastAPI, APIRouter
+from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi_pagination import add_pagination
 from fastapi_pagination.utils import disable_installed_extensions_check
@@ -32,8 +33,19 @@ async def lifespan(fastapi_app: FastAPI):
     await init_database()
     yield
 
+origins = [
+    "http://localhost",
+    "http://localhost:5173"
+]
 
 app = FastAPI(lifespan=lifespan, openapi_tags=tags_metadata, title=TITLE, description=DESCRIPTION)
+app.add_middleware(
+    middleware_class=CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 api_router = APIRouter(prefix="/api")
 api_router.include_router(product_router)
