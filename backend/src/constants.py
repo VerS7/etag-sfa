@@ -7,7 +7,7 @@ from os import getenv, path
 try:
     import dotenv
 
-    env_file_path = "backend/src/.env"
+    env_file_path = path.join(path.dirname(__file__), ".env")
 
     if path.isfile(env_file_path):
         dotenv.load_dotenv(env_file_path)

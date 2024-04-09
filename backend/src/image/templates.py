@@ -1,6 +1,8 @@
 """
 Image generating template
 """
+import os
+
 from abc import ABCMeta, abstractmethod, ABC
 from io import BytesIO
 
@@ -21,9 +23,10 @@ class BaseImageTemplate(ABC, metaclass=ABCMeta):
 
 class DefaultImage(BaseImageTemplate):
     def __init__(self):
-        self.bg_image = "backend/src/image/assets/default/default.png"
-        self.font = "backend/src/image/assets/default/tahoma.ttf"
-        self.bold_font = "backend/src/image/assets/default/tahoma_bold.ttf"
+        print()
+        self.bg_image = os.path.join(os.path.dirname(__file__), "assets/default/default.png")
+        self.font = os.path.join(os.path.dirname(__file__), "assets/default/tahoma.ttf")
+        self.bold_font = os.path.join(os.path.dirname(__file__), "assets/default/tahoma_bold.ttf")
 
         self.text_color = (0, 0, 0)
 
