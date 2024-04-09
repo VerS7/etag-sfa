@@ -11,13 +11,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
 from fastapi_pagination.utils import disable_installed_extensions_check
 
-from database.db import init_database
+from backend.src.database.db import init_database
 
-from constants import TITLE, DESCRIPTION
+from backend.src.constants import TITLE, DESCRIPTION
 
-from products.views import router as product_router
-from user_auth.views import router as user_auth_router
-from token_auth.views import router as token_auth_router
+from backend.src.products.views import router as product_router
+from backend.src.user_auth.views import router as user_auth_router
+from backend.src.token_auth.views import router as token_auth_router
 
 
 tags_metadata = [
@@ -33,15 +33,11 @@ async def lifespan(fastapi_app: FastAPI):
     await init_database()
     yield
 
-origins = [
-    "http://localhost",
-    "http://localhost:5173"
-]
 
 app = FastAPI(lifespan=lifespan, openapi_tags=tags_metadata, title=TITLE, description=DESCRIPTION)
 app.add_middleware(
     middleware_class=CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
