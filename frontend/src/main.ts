@@ -1,15 +1,36 @@
+// Vue
 import { createApp } from 'vue'
 import App from './App.vue'
 
+// Router
+import { createRouter, createWebHistory } from 'vue-router'
+
 // Vuetify
+import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+
+// Components
+import ProductTable from './components/ProductTable.vue'
+import LoginForm from './components/LoginForm.vue'
 
 const vuetify = createVuetify({
   components,
   directives
 })
 
-createApp(App).use(vuetify).mount('#app')
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    { path: '/', name: 'Home', component: ProductTable },
+    {
+      path: '/login',
+      name: 'Login',
+      component: LoginForm
+    }
+  ]
+})
+
+createApp(App).use(vuetify).use(router).mount('#app')

@@ -1,17 +1,15 @@
-<script setup lang="ts"></script>
-
-<template>
-  <main>
-    <div class="greetings">Пока тут ничего нет...</div>
-  </main>
-</template>
-
 <style scoped>
-main {
+html {
   display: flex;
 }
-.greetings {
-  margin: auto;
-  font-size: 55px;
+main {
+  align-items: center;
+  justify-content: center;
 }
 </style>
+
+<template>
+  <router-view />
+</template>
+
+<script setup lang="ts"></script>
