@@ -13,7 +13,7 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
 // Components
-import ProductTable from './components/ProductTable.vue'
+import MainPage from './components/MainPage.vue'
 import LoginForm from './components/LoginForm.vue'
 
 const vuetify = createVuetify({
@@ -24,7 +24,7 @@ const vuetify = createVuetify({
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/', name: 'Home', component: ProductTable },
+    { path: '/', name: 'Home', component: MainPage },
     {
       path: '/login',
       name: 'Login',

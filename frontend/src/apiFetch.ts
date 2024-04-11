@@ -3,7 +3,7 @@ export interface User {
   password: string
 }
 
-export interface Response {
+export interface UserResponse {
   role: string
   name: string
   hashed: string
@@ -14,12 +14,12 @@ export interface Product {
   name: string
   barcode: string
   price: string | null
-  salePrice: string | null
+  sale_price: string | null
   category: string | null
   producer: string | null
-  producerCountry: string | null
-  createdAt: string
-  updatedAt: string | null
+  producer_country: string | null
+  created_at: string
+  updated_at: string | null
 }
 
 export interface ProductPage {
@@ -36,7 +36,7 @@ export function getAuthCreds(user: User): string {
   return 'Basic ' + btoa(`${user.username}:${user.password}`)
 }
 
-export async function fetchUser(authCreds: string): Promise<Response> {
+export async function fetchUser(authCreds: string): Promise<UserResponse> {
   const response = await fetch(API_URL + '/login', {
     method: 'GET',
     headers: {

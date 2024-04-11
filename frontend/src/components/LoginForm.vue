@@ -45,14 +45,16 @@
 </template>
 
 <script setup lang="ts">
-import { fetchUser, getAuthCreds } from '@/apiFetch'
-import type { Response } from '@/apiFetch'
-
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import type { VForm } from 'vuetify/components'
 
-import { ref } from 'vue'
+import { fetchUser, getAuthCreds } from '@/apiFetch'
+import { userLogin } from '@/user'
 
 const form = ref<VForm | null>(null)
+
+const router = useRouter()
 
 const username = ref('')
 const password = ref('')
@@ -61,7 +63,11 @@ const visible = ref(false)
 const fetchErr = ref(false)
 const unauth = ref(false)
 
-const user = ref<Response | null>(null)
+const userCreds: string | null = localStorage.getItem('userAuthCreds')
+
+if (userCreds) {
+  router.push({ path: '/' })
+}
 
 async function submit(): Promise<void> {
   fetchErr.value = false
@@ -77,15 +83,19 @@ async function submit(): Promise<void> {
   }
 
   const authCreds: string = getAuthCreds({ username: username.value, password: password.value })
-
+  let user = null
   try {
-    user.value = await fetchUser(authCreds)
+    user = await fetchUser(authCreds)
   } catch (error) {
     if (typeof error !== 'object' || error === null || !('code' in error)) {
       return
     }
     error.code == 401 ? (unauth.value = true) : (fetchErr.value = true)
+    return
   }
-  localStorage.setItem('userAuthCreds', authCreds)
+  if (user) {
+    userLogin(authCreds, user)
+  }
+  router.push({ path: '/' })
 }
 </script>
