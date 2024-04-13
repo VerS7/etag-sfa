@@ -1,14 +1,40 @@
-<style scoped></style>
+<style scoped>
+.hover-underline {
+  text-decoration: none;
+  display: inline-block;
+  position: relative;
+  color: #0087ca;
+}
+.hover-underline:after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: #0087ca;
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+
+.hover-underline:hover:after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+</style>
 
 <template>
   <v-data-table-server
     v-model:items-per-page="itemsPerPage"
     :headers="headers"
+    :page="page"
     :items="items"
     :items-length="totalItems"
     :loading="loading"
     :density="'comfortable'"
     :itemsPerPageText="'Отобразить элементов:'"
+    :page-text="pageText()"
     :items-per-page-options="[
       { value: 15, title: '15' },
       { value: 30, title: '30' },
@@ -18,10 +44,17 @@
     item-value="name"
     @update:options="loadItems"
   >
+    <template v-slot:[`item.actions`]="{ item }">
+      <v-icon class="me-2" size="small" @click="editItem(item)"> mdi-pencil </v-icon>
+      <v-icon size="small" @click="deleteItem(item)"> mdi-delete </v-icon>
+    </template>
+
     <template v-slot:[`item.name`]="{ value }">
-      <a :href="value">
-        {{ value }}
-      </a>
+      <v-chip>
+        <a class="hover-underline" :href="value">
+          {{ value }}
+        </a>
+      </v-chip>
     </template>
   </v-data-table-server>
 </template>
@@ -41,8 +74,10 @@ const loading = ref<boolean>(false)
 const totalItems = ref<number>(0)
 const items = ref<Array<Product>>()
 const itemsPerPage = ref<number>(15)
+const page = ref<number>(1)
 
 const headers = [
+  { title: 'Действие', key: 'actions', align: 'end', sortable: false },
   { title: 'ID', key: 'id', align: 'end', sortable: false },
   { title: 'Название', key: 'name', align: 'end', sortable: false },
   { title: 'Штрих-код', key: 'barcode', align: 'end', sortable: false },
@@ -64,14 +99,32 @@ interface paginationOptions {
   sortBy: string
 }
 
+function pageText(): string {
+  const p = page.value
+  const ipt = itemsPerPage.value
+  const t = totalItems.value
+
+  if (!p || !ipt) {
+    return ''
+  }
+
+  const start = (p - 1) * ipt
+  const end = Math.min(start + ipt - 1, t - 1)
+
+  return `${start + 1}-${end + 1} из ${t}`
+}
+
 async function loadItems(options: paginationOptions) {
   if (userCreds === null) {
     router.push({ path: '/login' })
     return
   }
+  loading.value = true
+  page.value = options.page
   const productPage = await fetchProducts(userCreds, options.page, options.itemsPerPage)
 
   items.value = productPage.items.map((element) => {
+    loading.value = false
     return {
       ...element,
       created_at: formatDate(element.created_at),
