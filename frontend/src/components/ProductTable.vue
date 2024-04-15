@@ -32,8 +32,11 @@
     :items="items"
     :items-length="totalItems"
     :loading="loading"
+    :search="search"
     :density="'comfortable'"
     :itemsPerPageText="'Отобразить элементов:'"
+    :no-data-text="'Не удалось загрузить данные.'"
+    :loading-text="'Загрузка данных...'"
     :page-text="pageText()"
     :items-per-page-options="[
       { value: 15, title: '15' },
@@ -45,8 +48,20 @@
     @update:options="loadItems"
   >
     <template v-slot:[`item.actions`]="{ item }">
-      <v-icon class="me-2" size="small" @click="editItem(item)"> mdi-pencil </v-icon>
-      <v-icon size="small" @click="deleteItem(item)"> mdi-delete </v-icon>
+      <v-icon
+        ref="editItemActivator"
+        class="me-2"
+        size="small"
+        @click="
+          () => {
+            editableItem = item
+            editItemActive = !editItemActive
+          }
+        "
+      >
+        mdi-pencil
+      </v-icon>
+      <v-icon size="small" @click="console.log(item)"> mdi-delete </v-icon>
     </template>
 
     <template v-slot:[`item.name`]="{ value }">
@@ -57,11 +72,21 @@
       </v-chip>
     </template>
   </v-data-table-server>
+
+  <v-dialog v-model="editItemActive" max-width="800">
+    <ItemEditForm
+      :item="editableItem"
+      @Submit="updateProduct()"
+      @Discard="editItemActive = !editItemActive"
+    ></ItemEditForm>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
+
+import ItemEditForm from './ItemEditForm.vue'
 
 import { fetchProducts } from '@/apiFetch'
 import { formatDate } from '@/format'
@@ -70,13 +95,30 @@ import type { Product } from '@/apiFetch'
 const router = useRouter()
 const userCreds: string | null = localStorage.getItem('userAuthCreds')
 
+const search = ref<string>()
+const editItemActive = ref<boolean>(false)
+const editableItem = ref<Product>()
+
 const loading = ref<boolean>(false)
 const totalItems = ref<number>(0)
 const items = ref<Array<Product>>()
 const itemsPerPage = ref<number>(15)
 const page = ref<number>(1)
 
-const headers = [
+interface ProductDataTableHeader {
+  title: string
+  key: string
+  align: 'start' | 'end' | 'center'
+  sortable?: boolean
+}
+
+interface paginationOptions {
+  page: number
+  itemsPerPage: number
+  sortBy: string
+}
+
+const headers: ProductDataTableHeader[] = [
   { title: 'Действие', key: 'actions', align: 'end', sortable: false },
   { title: 'ID', key: 'id', align: 'end', sortable: false },
   { title: 'Название', key: 'name', align: 'end', sortable: false },
@@ -93,12 +135,6 @@ const headers = [
   { title: 'Обновлено', key: 'updated_at', align: 'end' }
 ]
 
-interface paginationOptions {
-  page: number
-  itemsPerPage: number
-  sortBy: string
-}
-
 function pageText(): string {
   const p = page.value
   const ipt = itemsPerPage.value
@@ -114,14 +150,29 @@ function pageText(): string {
   return `${start + 1}-${end + 1} из ${t}`
 }
 
+async function updateProduct() {
+  search.value = String(Date.now())
+  editItemActive.value = !editItemActive.value
+}
+
 async function loadItems(options: paginationOptions) {
   if (userCreds === null) {
     router.push({ path: '/login' })
     return
   }
+
+  let productPage = null
+
   loading.value = true
+
+  try {
+    productPage = await fetchProducts(userCreds, options.page, options.itemsPerPage)
+  } catch {
+    loading.value = false
+    return
+  }
+
   page.value = options.page
-  const productPage = await fetchProducts(userCreds, options.page, options.itemsPerPage)
 
   items.value = productPage.items.map((element) => {
     loading.value = false
