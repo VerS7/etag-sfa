@@ -34,7 +34,7 @@ class ProductUpdate(ProductCreate):
 class ProductUpdatePartial(ProductBase):
     """Partial update product schema"""
     name: str | None
-    price: str | None
+    price: Decimal | None
     barcode: str | None
 
 
