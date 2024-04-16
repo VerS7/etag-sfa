@@ -133,8 +133,6 @@ let newItem = ref(
   )
 )
 
-console.log(newItem)
-
 const emits = defineEmits<{
   (e: 'submit', data: ProductUpdate, productID: number): void
   (e: 'discard'): void
