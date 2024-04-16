@@ -53,8 +53,10 @@
               density="compact"
               variant="outlined"
               v-model="newItem.price"
+              type="number"
               label="Цена"
               suffix="руб."
+              hide-spin-buttons
               required
             ></v-text-field>
           </v-col>
@@ -64,8 +66,10 @@
               density="compact"
               variant="outlined"
               v-model="newItem.sale_price"
+              type="number"
               label="Цена по акции"
               suffix="руб."
+              hide-spin-buttons
             ></v-text-field>
           </v-col>
         </v-row>
@@ -113,19 +117,28 @@
 </template>
 
 <script setup lang="ts">
+import type { Product, ProductUpdate } from '@/apiFetch'
 import { ref } from 'vue'
 import { VForm } from 'vuetify/components'
 
-const props = defineProps({
-  item: null
-})
+const props = defineProps<{
+  item: Product
+}>()
 
-const emits = defineEmits({
-  submit: () => true,
-  discard: () => true
-})
+let productID = props.item.id
 
-const newItem = { ...props.item }
+let newItem = ref(
+  Object.fromEntries(
+    Object.entries(props.item).filter(([key]) => !['id', 'created_at', 'updated_at'].includes(key))
+  )
+)
+
+console.log(newItem)
+
+const emits = defineEmits<{
+  (e: 'submit', data: ProductUpdate, productID: number): void
+  (e: 'discard'): void
+}>()
 
 const itemForm = ref<VForm | null>(null)
 const formValidity = ref<boolean>(true)
@@ -139,7 +152,16 @@ async function validateForm() {
 
   if (!valid) {
     formValidity.value = false
+    return
   }
-  emits('submit')
+  const productToUpdate = Object.fromEntries(
+    Object.entries(newItem.value).map(([key, value]) => [
+      key,
+      key === 'price' ? parseFloat(value) : value,
+      key === 'sale_price' ? (value === null ? null : parseFloat(value)) : value
+    ])
+  )
+
+  emits('submit', productToUpdate, productID)
 }
 </script>

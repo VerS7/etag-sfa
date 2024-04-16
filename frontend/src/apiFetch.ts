@@ -13,13 +13,27 @@ export interface Product {
   id: number
   name: string
   barcode: string
-  price: string | null
-  sale_price: string | null
+  price: number
+  sale_price: number | null
   category: string | null
+  subcategory: string | null
   producer: string | null
   producer_country: string | null
+  brand: string | null
   created_at: string
   updated_at: string | null
+}
+
+export interface ProductUpdate {
+  name: string | null
+  barcode: string | null
+  price: number | null
+  sale_price: number | null
+  category: string | null
+  subcategory: string | null
+  producer: string | null
+  producer_country: string | null
+  brand: string | null
 }
 
 export interface ProductPage {
@@ -72,4 +86,22 @@ export async function fetchProducts(
   }
 
   return response.json()
+}
+
+export async function putUpdatedProduct(
+  authCreds: string,
+  product: ProductUpdate,
+  productID: number
+): Promise<void> {
+  const response = await fetch(API_URL + `/product/${productID}/`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: authCreds
+    },
+    body: JSON.stringify(product)
+  })
+  if (!response.ok) {
+    throw { error: new Error(`${response.statusText}`), code: response.status }
+  }
 }

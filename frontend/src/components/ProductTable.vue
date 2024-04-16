@@ -74,11 +74,13 @@
   </v-data-table-server>
 
   <v-dialog v-model="editItemActive" max-width="800">
-    <ItemEditForm
-      :item="editableItem"
-      @Submit="updateProduct()"
-      @Discard="editItemActive = !editItemActive"
-    ></ItemEditForm>
+    <template v-if="editableItem">
+      <ItemEditForm
+        :item="editableItem"
+        @Submit="updateProduct"
+        @Discard="editItemActive = !editItemActive"
+      ></ItemEditForm>
+    </template>
   </v-dialog>
 </template>
 
@@ -88,16 +90,16 @@ import { ref } from 'vue'
 
 import ItemEditForm from './ItemEditForm.vue'
 
-import { fetchProducts } from '@/apiFetch'
+import { fetchProducts, putUpdatedProduct } from '@/apiFetch'
 import { formatDate } from '@/format'
-import type { Product } from '@/apiFetch'
+import type { Product, ProductUpdate } from '@/apiFetch'
 
 const router = useRouter()
 const userCreds: string | null = localStorage.getItem('userAuthCreds')
 
 const search = ref<string>()
 const editItemActive = ref<boolean>(false)
-const editableItem = ref<Product>()
+const editableItem = ref<Product | null>(null)
 
 const loading = ref<boolean>(false)
 const totalItems = ref<number>(0)
@@ -150,9 +152,22 @@ function pageText(): string {
   return `${start + 1}-${end + 1} из ${t}`
 }
 
-async function updateProduct() {
-  search.value = String(Date.now())
+async function updateProduct(product: ProductUpdate, productID: number) {
+  if (userCreds === null) {
+    router.push({ path: '/login' })
+    return
+  }
+
+  try {
+    putUpdatedProduct(userCreds, product, productID)
+  } catch {
+    return
+  }
   editItemActive.value = !editItemActive.value
+
+  setTimeout(() => {
+    search.value = String(Date.now())
+  }, 1000)
 }
 
 async function loadItems(options: paginationOptions) {
@@ -175,13 +190,14 @@ async function loadItems(options: paginationOptions) {
   page.value = options.page
 
   items.value = productPage.items.map((element) => {
-    loading.value = false
     return {
       ...element,
       created_at: formatDate(element.created_at),
       updated_at: element.updated_at ? formatDate(element.updated_at) : null
     }
   })
+
+  loading.value = false
 
   if (productPage.total !== null) {
     totalItems.value = productPage.total
