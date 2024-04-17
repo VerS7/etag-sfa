@@ -105,3 +105,15 @@ export async function putUpdatedProduct(
     throw { error: new Error(`${response.statusText}`), code: response.status }
   }
 }
+
+export async function deleteProductByID(authCreds: string, productID: number): Promise<void> {
+  const response = await fetch(API_URL + `/product/${productID}/`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: authCreds
+    }
+  })
+  if (!response.ok) {
+    throw { error: new Error(`${response.statusText}`), code: response.status }
+  }
+}

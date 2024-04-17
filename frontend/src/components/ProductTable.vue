@@ -54,14 +54,22 @@
         size="small"
         @click="
           () => {
-            editableItem = item
-            editItemActive = !editItemActive
+            swapProductDialog('editable', item)
           }
         "
       >
         mdi-pencil
       </v-icon>
-      <v-icon size="small" @click="console.log(item)"> mdi-delete </v-icon>
+      <v-icon
+        size="small"
+        @click="
+          () => {
+            swapProductDialog('deletable', item)
+          }
+        "
+      >
+        mdi-delete
+      </v-icon>
     </template>
 
     <template v-slot:[`item.name`]="{ value }">
@@ -71,15 +79,35 @@
         </a>
       </v-chip>
     </template>
+    <template v-slot:[`footer.prepend`]>
+      <v-btn
+        class="ml-3 text-primary"
+        @click="emptyProduct ? swapProductDialog('creatable', emptyProduct) : null"
+        >Добавить</v-btn
+      >
+      <v-spacer></v-spacer>
+    </template>
   </v-data-table-server>
 
-  <v-dialog v-model="editItemActive" max-width="800">
-    <template v-if="editableItem">
+  <v-dialog v-model="itemDialogActive" max-width="800">
+    <template v-if="itemRefs.editable.value">
       <ItemEditForm
-        :item="editableItem"
+        :item="itemRefs.editable.value"
         @Submit="updateProduct"
-        @Discard="editItemActive = !editItemActive"
+        @Discard="itemDialogActive = !itemDialogActive"
       ></ItemEditForm>
+    </template>
+
+    <template v-if="itemRefs.deletable.value">
+      <ItemDeleteForm
+        :item="itemRefs.deletable.value"
+        @Submit="deleteProduct"
+        @Discard="itemDialogActive = !itemDialogActive"
+      ></ItemDeleteForm>
+    </template>
+
+    <template v-if="itemRefs.creatable.value">
+      <div>1</div>
     </template>
   </v-dialog>
 </template>
@@ -89,8 +117,9 @@ import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 
 import ItemEditForm from './ItemEditForm.vue'
+import ItemDeleteForm from './ItemDeleteForm.vue'
 
-import { fetchProducts, putUpdatedProduct } from '@/apiFetch'
+import { fetchProducts, putUpdatedProduct, deleteProductByID } from '@/apiFetch'
 import { formatDate } from '@/format'
 import type { Product, ProductUpdate } from '@/apiFetch'
 
@@ -98,8 +127,17 @@ const router = useRouter()
 const userCreds: string | null = localStorage.getItem('userAuthCreds')
 
 const search = ref<string>()
-const editItemActive = ref<boolean>(false)
-const editableItem = ref<Product | null>(null)
+
+type itemAction = 'creatable' | 'deletable' | 'editable'
+const itemRefs: { [key: string] } = {
+  creatable: ref<Product | null>(null),
+  editable: ref<Product | null>(null),
+  deletable: ref<ProductUpdate | null>(null)
+}
+
+const itemDialogActive = ref<boolean>(false)
+
+const emptyProduct = ref<ProductUpdate | null>(createEmptyProduct())
 
 const loading = ref<boolean>(false)
 const totalItems = ref<number>(0)
@@ -125,17 +163,38 @@ const headers: ProductDataTableHeader[] = [
   { title: 'ID', key: 'id', align: 'end', sortable: false },
   { title: 'Название', key: 'name', align: 'end', sortable: false },
   { title: 'Штрих-код', key: 'barcode', align: 'end', sortable: false },
-  { title: 'Цена, р.', key: 'price', align: 'end' },
-  { title: 'Цена по акции, р', key: 'sale_price', align: 'end' },
+  { title: 'Цена, р.', key: 'price', align: 'end', sortable: false },
+  { title: 'Цена по акции, р', key: 'sale_price', align: 'end', sortable: false },
   { title: 'Категория', key: 'category', align: 'end' },
-  { title: 'Подкатегория', key: 'subcategory', align: 'end' },
-  { title: 'Бренд', key: 'brand', align: 'end' },
-  { title: 'Единицы', key: 'unit', align: 'end' },
-  { title: 'Производитель', key: 'producer', align: 'end' },
-  { title: 'Страна', key: 'producer_country', align: 'end' },
-  { title: 'Создано', key: 'created_at', align: 'end' },
-  { title: 'Обновлено', key: 'updated_at', align: 'end' }
+  { title: 'Подкатегория', key: 'subcategory', align: 'end', sortable: false },
+  { title: 'Бренд', key: 'brand', align: 'end', sortable: false },
+  { title: 'Единицы', key: 'unit', align: 'end', sortable: false },
+  { title: 'Производитель', key: 'producer', align: 'end', sortable: false },
+  { title: 'Страна', key: 'producer_country', align: 'end', sortable: false },
+  { title: 'Создано', key: 'created_at', align: 'end', sortable: false },
+  { title: 'Обновлено', key: 'updated_at', align: 'end', sortable: false }
 ]
+
+function createEmptyProduct(): ProductUpdate {
+  return {
+    name: '',
+    barcode: '',
+    price: 0,
+    sale_price: 0,
+    category: '',
+    subcategory: '',
+    producer: '',
+    producer_country: '',
+    brand: ''
+  }
+}
+
+function swapProductDialog(swapTo: itemAction, item: Product | ProductUpdate) {
+  for (const name in itemRefs) {
+    itemRefs[name].value = name === swapTo ? item : null
+  }
+  itemDialogActive.value = !itemDialogActive.value
+}
 
 function pageText(): string {
   const p = page.value
@@ -163,7 +222,24 @@ async function updateProduct(product: ProductUpdate, productID: number) {
   } catch {
     return
   }
-  editItemActive.value = !editItemActive.value
+  itemDialogActive.value = !itemDialogActive.value
+
+  setTimeout(() => {
+    search.value = String(Date.now())
+  }, 1000)
+}
+
+async function deleteProduct(productID: number) {
+  if (userCreds === null) {
+    router.push({ path: '/login' })
+    return
+  }
+  try {
+    deleteProductByID(userCreds, productID)
+  } catch {
+    return
+  }
+  itemDialogActive.value = !itemDialogActive.value
 
   setTimeout(() => {
     search.value = String(Date.now())
