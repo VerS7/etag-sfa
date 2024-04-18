@@ -117,9 +117,11 @@
 </template>
 
 <script setup lang="ts">
-import type { Product, ProductUpdate } from '@/apiFetch'
 import { ref } from 'vue'
 import { VForm } from 'vuetify/components'
+
+import type { Product, ProductUpdate } from '@/apiFetch'
+import { formatProduct, productToProductUpdate } from '@/format'
 
 const props = defineProps<{
   item: Product
@@ -127,11 +129,7 @@ const props = defineProps<{
 
 let productID = props.item.id
 
-let newItem = ref(
-  Object.fromEntries(
-    Object.entries(props.item).filter(([key]) => !['id', 'created_at', 'updated_at'].includes(key))
-  )
-)
+let newItem = ref<ProductUpdate>(productToProductUpdate(props.item))
 
 const emits = defineEmits<{
   (e: 'submit', data: ProductUpdate, productID: number): void
@@ -152,14 +150,6 @@ async function validateForm() {
     formValidity.value = false
     return
   }
-  const productToUpdate = Object.fromEntries(
-    Object.entries(newItem.value).map(([key, value]) => [
-      key,
-      key === 'price' ? parseFloat(value) : value,
-      key === 'sale_price' ? (value === null ? null : parseFloat(value)) : value
-    ])
-  )
-
-  emits('submit', productToUpdate, productID)
+  emits('submit', formatProduct(newItem.value), productID)
 }
 </script>

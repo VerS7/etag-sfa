@@ -1,3 +1,18 @@
+import type { Product, ProductUpdate } from './apiFetch'
+
+export function formatProduct(product: Product | ProductUpdate): ProductUpdate {
+  return {
+    ...product,
+    price: typeof product.price === 'string' ? parseFloat(product.price) : product.price
+  }
+}
+
+export function productToProductUpdate(product: Product): ProductUpdate {
+  return Object.fromEntries(
+    Object.entries(product).filter(([key]) => !['id', 'created_at', 'updated_at'].includes(key))
+  ) as ProductUpdate
+}
+
 export function formatDate(date: string): string {
   const d = new Date(date)
   return `${formatUnit(d.getDate())}.${formatUnit(d.getMonth())}.${formatUnit(d.getFullYear())} ${formatUnit(d.getHours())}:${formatUnit(d.getMinutes())}`
