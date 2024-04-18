@@ -107,7 +107,11 @@
     </template>
 
     <template v-if="itemRefs.creatable.value">
-      <div>1</div>
+      <ItemCreateForm
+        :item="itemRefs.creatable.value"
+        @Submit="createProduct"
+        @Discard="itemDialogActive = !itemDialogActive"
+      ></ItemCreateForm>
     </template>
   </v-dialog>
 </template>
@@ -118,8 +122,9 @@ import { ref } from 'vue'
 
 import ItemEditForm from './ItemEditForm.vue'
 import ItemDeleteForm from './ItemDeleteForm.vue'
+import ItemCreateForm from './ItemCreateForm.vue'
 
-import { fetchProducts, putUpdatedProduct, deleteProductByID } from '@/apiFetch'
+import { fetchProducts, putUpdatedProduct, deleteProductByID, createNewProduct } from '@/apiFetch'
 import { formatDate } from '@/format'
 import type { Product, ProductUpdate } from '@/apiFetch'
 
@@ -183,6 +188,7 @@ function createEmptyProduct(): ProductUpdate {
     sale_price: 0,
     category: '',
     subcategory: '',
+    unit: '',
     producer: '',
     producer_country: '',
     brand: ''
@@ -209,6 +215,24 @@ function pageText(): string {
   const end = Math.min(start + ipt - 1, t - 1)
 
   return `${start + 1}-${end + 1} из ${t}`
+}
+
+async function createProduct(product: ProductUpdate) {
+  if (userCreds === null) {
+    router.push({ path: '/login' })
+    return
+  }
+
+  try {
+    createNewProduct(userCreds, product)
+  } catch {
+    return
+  }
+  itemDialogActive.value = !itemDialogActive.value
+
+  setTimeout(() => {
+    search.value = String(Date.now())
+  }, 1000)
 }
 
 async function updateProduct(product: ProductUpdate, productID: number) {
