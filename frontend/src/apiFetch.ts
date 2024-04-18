@@ -13,13 +13,14 @@ export interface Product {
   id: number
   name: string
   barcode: string
-  price: number
+  price: number | string
   sale_price: number | null
   category: string | null
   subcategory: string | null
   producer: string | null
   producer_country: string | null
   brand: string | null
+  unit: string | null
   created_at: string
   updated_at: string | null
 }
@@ -31,6 +32,7 @@ export interface ProductUpdate {
   sale_price: number | null
   category: string | null
   subcategory: string | null
+  unit: string | null
   producer: string | null
   producer_country: string | null
   brand: string | null
@@ -112,6 +114,20 @@ export async function deleteProductByID(authCreds: string, productID: number): P
     headers: {
       Authorization: authCreds
     }
+  })
+  if (!response.ok) {
+    throw { error: new Error(`${response.statusText}`), code: response.status }
+  }
+}
+
+export async function createNewProduct(authCreds: string, product: ProductUpdate): Promise<void> {
+  const response = await fetch(API_URL + `/product/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: authCreds
+    },
+    body: JSON.stringify(product)
   })
   if (!response.ok) {
     throw { error: new Error(`${response.statusText}`), code: response.status }
