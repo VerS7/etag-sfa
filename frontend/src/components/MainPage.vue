@@ -1,7 +1,11 @@
 <template>
   <v-container fluid class="mb-10" dense>
     <v-app-bar color="light-green" elevation="5" dense>
-      <v-btn height="70%" class="ml-5" :prepend-icon="'mdi-tag'" @click="router.push({ path: '/' })"
+      <v-btn
+        height="70%"
+        class="ml-5"
+        :prepend-icon="'mdi-tag'"
+        @click="router.push({ path: '/products' })"
         >Продукты</v-btn
       >
       <v-btn
@@ -55,14 +59,12 @@
       </v-menu>
     </v-app-bar>
   </v-container>
-  <ProductTable> </ProductTable>
+  <router-view></router-view>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
-
-import ProductTable from './ProductTable.vue'
 
 import { getUser, getUserCreds, userLogout } from '@/user'
 import type { UserResponse } from '@/apiFetch'
@@ -75,4 +77,5 @@ const userCreds: string | null = getUserCreds()
 if (!userCreds) {
   router.push({ path: '/login' })
 }
+router.push({ path: '/products' })
 </script>
