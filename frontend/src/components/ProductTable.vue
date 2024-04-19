@@ -52,30 +52,17 @@
         ref="editItemActivator"
         class="me-2"
         size="small"
-        @click="
-          () => {
-            swapProductDialog('editable', item)
-          }
-        "
+        @click="swapProductDialog('editable', item)"
       >
         mdi-pencil
       </v-icon>
-      <v-icon
-        size="small"
-        @click="
-          () => {
-            swapProductDialog('deletable', item)
-          }
-        "
-      >
-        mdi-delete
-      </v-icon>
+      <v-icon size="small" @click="swapProductDialog('deletable', item)"> mdi-delete </v-icon>
     </template>
 
-    <template v-slot:[`item.name`]="{ value }">
-      <v-chip>
-        <a class="hover-underline" :href="value">
-          {{ value }}
+    <template v-slot:[`item.name`]="{ item }">
+      <v-chip @click="swapProductDialog('showable', item)">
+        <a class="hover-underline">
+          {{ item.name }}
         </a>
       </v-chip>
     </template>
@@ -113,6 +100,13 @@
         @Discard="itemDialogActive = !itemDialogActive"
       ></ItemCreateForm>
     </template>
+
+    <template v-if="itemRefs.showable.value">
+      <ItemForm
+        :item="itemRefs.showable.value"
+        @Discard="itemDialogActive = !itemDialogActive"
+      ></ItemForm>
+    </template>
   </v-dialog>
 </template>
 
@@ -123,6 +117,7 @@ import { ref } from 'vue'
 import ItemEditForm from './ItemEditForm.vue'
 import ItemDeleteForm from './ItemDeleteForm.vue'
 import ItemCreateForm from './ItemCreateForm.vue'
+import ItemForm from './ItemForm.vue'
 
 import { fetchProducts, putUpdatedProduct, deleteProductByID, createNewProduct } from '@/apiFetch'
 import { formatDate } from '@/format'
@@ -133,9 +128,10 @@ const userCreds: string | null = localStorage.getItem('userAuthCreds')
 
 const search = ref<string>()
 
-type itemAction = 'creatable' | 'deletable' | 'editable'
+type itemAction = 'creatable' | 'deletable' | 'editable' | 'showable'
 const itemRefs: { [key: string] } = {
   creatable: ref<Product | null>(null),
+  showable: ref<Product | null>(null),
   editable: ref<Product | null>(null),
   deletable: ref<ProductUpdate | null>(null)
 }

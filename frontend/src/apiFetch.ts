@@ -133,3 +133,17 @@ export async function createNewProduct(authCreds: string, product: ProductUpdate
     throw { error: new Error(`${response.statusText}`), code: response.status }
   }
 }
+
+export async function getProductImage(authCreds: string, productID: number): Promise<Blob> {
+  const response = await fetch(API_URL + `/product/image/${productID}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'image/png',
+      Authorization: authCreds
+    }
+  })
+  if (!response.ok) {
+    throw { error: new Error(`${response.statusText}`), code: response.status }
+  }
+  return response.blob()
+}
