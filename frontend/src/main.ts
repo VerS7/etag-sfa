@@ -15,7 +15,9 @@ import * as directives from 'vuetify/directives'
 // Components
 import MainPage from './components/MainPage.vue'
 import LoginForm from './components/LoginForm.vue'
-import ProductTable from './components/ProductTable.vue'
+import ProductTable from './components/ProductTablePage.vue'
+import UsersPage from './components/UsersPage.vue'
+import AdminPanelPage from './components/AdminPanelPage.vue'
 
 const vuetify = createVuetify({
   components,
@@ -39,13 +41,17 @@ const router = createRouter({
           path: '/products',
           name: 'Products',
           component: ProductTable
+        },
+        {
+          path: '/users',
+          name: 'Users',
+          component: UsersPage
+        },
+        {
+          path: '/admin',
+          name: 'Admin-panel',
+          component: AdminPanelPage
         }
-        // {
-        //   path: '/users', name: 'Users', component: ''
-        // },
-        // {
-        //   path: '/admin', name: 'Admin-panel', component: ''
-        // }
       ]
     }
   ]
