@@ -16,7 +16,7 @@ import * as directives from 'vuetify/directives'
 import MainPage from './components/MainPage.vue'
 import LoginForm from './components/LoginForm.vue'
 import ProductTable from './components/ProductTablePage.vue'
-import UsersPage from './components/UsersPage.vue'
+import UsersPage from './components/TokensPage.vue'
 import AdminPanelPage from './components/AdminPanelPage.vue'
 
 const vuetify = createVuetify({
@@ -43,8 +43,8 @@ const router = createRouter({
           component: ProductTable
         },
         {
-          path: '/users',
-          name: 'Users',
+          path: '/tokens',
+          name: 'Tokens',
           component: UsersPage
         },
         {

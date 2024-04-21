@@ -11,9 +11,9 @@
       <v-btn
         height="70%"
         class="ml-5"
-        :prepend-icon="'mdi-account-group'"
-        @click="router.push({ path: '/users' })"
-        >Пользователи</v-btn
+        :prepend-icon="'mdi-key'"
+        @click="router.push({ path: '/tokens' })"
+        >Токены</v-btn
       >
       <v-btn
         v-if="user?.role === 'admin'"
