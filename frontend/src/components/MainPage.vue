@@ -74,5 +74,5 @@ const { user, check, logout } = useUser()
 if (!check()) {
   router.push({ path: '/login' })
 }
-router.push({ path: '/' })
+router.push({ path: '/products' })
 </script>
