@@ -3,7 +3,7 @@ Simple script for adding mock data to app API
 """
 import os.path
 from random import choice, randint
-from os import getenv, path
+from os import getenv
 
 import requests
 from dotenv import load_dotenv
@@ -32,12 +32,22 @@ with requests.Session() as session:
         try:
             product = list(builder.generate_completed_product())[0]
             print(f"POST | {str(product)[:70]}... | ", end="")
+
             response = requests.post(api_url, data=product.model_dump_json().encode("utf-8"))
+
+            if response.status_code == 401:
+                print(f"FAIL! 401 Unauthorised!")
+                continue
+
             print("SUCCESS!")
 
         except requests.exceptions.ConnectionError:
             print(f"FAIL!\n")
             exit()
 
-        except StopIteration:
+        except KeyboardInterrupt:
+            exit()
+
+        except Exception as e:
+            print(f"Uncaught error! {e}")
             exit()

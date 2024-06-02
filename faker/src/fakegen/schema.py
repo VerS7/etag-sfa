@@ -1,8 +1,6 @@
 """
 Products
 """
-from decimal import Decimal
-
 from pydantic import BaseModel, Field
 
 
@@ -17,9 +15,10 @@ class Product(BaseModel):
 
 class CompletedProduct(BaseModel):
     """Completed product for uploading"""
+    name: str
     barcode: str
-    price: Decimal 
-    sale_price: Decimal | None 
+    price: str
+    sale_price: str | None
     category: str | None 
     subcategory: str | None
     brand: str | None

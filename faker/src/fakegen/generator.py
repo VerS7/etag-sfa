@@ -32,13 +32,13 @@ class ProductBuilder:
                     named_items.append({category: item})
         return named_items
 
-    def _generate_price(self, min_price: Decimal) -> Decimal:
+    def _generate_price(self, min_price: Decimal) -> str:
         if self._pm < 1:
             raise ValueError(f"{self._pm=} is lower than 1.")
 
-        return (min_price * Decimal(self._pm)).quantize(Decimal("1.00"))
+        return str((min_price * Decimal(self._pm)).quantize(Decimal("1.00")))
 
-    def _generate_sale_price(self, min_price: Decimal) -> Decimal | None:
+    def _generate_sale_price(self, min_price: Decimal) -> str | None:
         if self._sm > 0.99 or self._sm <= 0:
             raise ValueError(f"{self._sm} is incorrect.")
 
@@ -46,7 +46,7 @@ class ProductBuilder:
             raise ValueError(f"{self._sm} is incorrect.")
 
         if random() < self._sc:
-            return (min_price - (min_price * Decimal(self._sm))).quantize(Decimal("1.00"))
+            return str((min_price - (min_price * Decimal(self._sm))).quantize(Decimal("1.00")))
         return None
 
     def _generate(self, schema):
