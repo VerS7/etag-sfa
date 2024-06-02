@@ -46,11 +46,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import type { VForm } from 'vuetify/components'
 
-import { fetchUser, getAuthCreds } from '@/apiFetch'
-import { userLogin } from '@/user'
+import { useUser } from '@/user'
+import { useRouter } from 'vue-router'
 
 const form = ref<VForm | null>(null)
 
@@ -63,11 +62,7 @@ const visible = ref(false)
 const fetchErr = ref(false)
 const unauth = ref(false)
 
-const userCreds: string | null = localStorage.getItem('userAuthCreds')
-
-if (userCreds) {
-  router.push({ path: '/' })
-}
+const { login } = useUser()
 
 async function submit(): Promise<void> {
   fetchErr.value = false
@@ -82,10 +77,8 @@ async function submit(): Promise<void> {
     return
   }
 
-  const authCreds: string = getAuthCreds({ username: username.value, password: password.value })
-  let user = null
   try {
-    user = await fetchUser(authCreds)
+    await login({ username: username.value, password: password.value })
   } catch (error) {
     if (typeof error !== 'object' || error === null || !('code' in error)) {
       return
@@ -93,9 +86,6 @@ async function submit(): Promise<void> {
     error.code == 401 ? (unauth.value = true) : (fetchErr.value = true)
     return
   }
-  if (user) {
-    userLogin(authCreds, user)
-  }
-  router.push({ path: '/' })
+  router.push('/')
 }
 </script>

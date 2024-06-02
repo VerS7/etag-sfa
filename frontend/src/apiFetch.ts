@@ -1,3 +1,5 @@
+import { useUser } from '@/user'
+
 export interface User {
   username: string
   password: string
@@ -13,8 +15,8 @@ export interface Product {
   id: number
   name: string
   barcode: string
-  price: number | string
-  sale_price: number | null
+  price: string
+  sale_price: string | null
   category: string | null
   subcategory: string | null
   producer: string | null
@@ -28,8 +30,8 @@ export interface Product {
 export interface ProductUpdate {
   name: string | null
   barcode: string | null
-  price: number | null
-  sale_price: number | null
+  price: string | null
+  sale_price: string | null
   category: string | null
   subcategory: string | null
   unit: string | null
@@ -48,15 +50,13 @@ export interface ProductPage {
 
 const API_URL: string = 'http://127.0.0.1:8000/api'
 
-export function getAuthCreds(user: User): string {
-  return 'Basic ' + btoa(`${user.username}:${user.password}`)
-}
+const { getCreds } = useUser()
 
-export async function fetchUser(authCreds: string): Promise<UserResponse> {
+export async function fetchUser(userCreds: string): Promise<UserResponse> {
   const response = await fetch(API_URL + '/login', {
     method: 'GET',
     headers: {
-      Authorization: authCreds
+      Authorization: userCreds
     }
   })
 
@@ -71,15 +71,16 @@ export async function fetchUser(authCreds: string): Promise<UserResponse> {
   }))
 }
 
-export async function fetchProducts(
-  authCreds: string,
-  page: number,
-  pageSize: number
-): Promise<ProductPage> {
+export async function fetchProducts(page: number, pageSize: number): Promise<ProductPage> {
+  const creds = getCreds()
+  if (creds === null) {
+    throw new Error('User credentials not found!')
+  }
+
   const response = await fetch(API_URL + `/product/?page=${page}&size=${pageSize}`, {
     method: 'GET',
     headers: {
-      Authorization: authCreds
+      Authorization: creds
     }
   })
 
@@ -90,16 +91,17 @@ export async function fetchProducts(
   return response.json()
 }
 
-export async function putUpdatedProduct(
-  authCreds: string,
-  product: ProductUpdate,
-  productID: number
-): Promise<void> {
+export async function putUpdatedProduct(product: ProductUpdate, productID: number): Promise<void> {
+  const creds = getCreds()
+  if (creds === null) {
+    throw new Error('User credentials not found!')
+  }
+
   const response = await fetch(API_URL + `/product/${productID}/`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: authCreds
+      Authorization: creds
     },
     body: JSON.stringify(product)
   })
@@ -108,11 +110,16 @@ export async function putUpdatedProduct(
   }
 }
 
-export async function deleteProductByID(authCreds: string, productID: number): Promise<void> {
+export async function deleteProductByID(productID: number): Promise<void> {
+  const creds = getCreds()
+  if (creds === null) {
+    throw new Error('User credentials not found!')
+  }
+
   const response = await fetch(API_URL + `/product/${productID}/`, {
     method: 'DELETE',
     headers: {
-      Authorization: authCreds
+      Authorization: creds
     }
   })
   if (!response.ok) {
@@ -120,12 +127,17 @@ export async function deleteProductByID(authCreds: string, productID: number): P
   }
 }
 
-export async function createNewProduct(authCreds: string, product: ProductUpdate): Promise<void> {
+export async function createNewProduct(product: ProductUpdate): Promise<void> {
+  const creds = getCreds()
+  if (creds === null) {
+    throw new Error('User credentials not found!')
+  }
+
   const response = await fetch(API_URL + `/product/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: authCreds
+      Authorization: creds
     },
     body: JSON.stringify(product)
   })
@@ -134,12 +146,17 @@ export async function createNewProduct(authCreds: string, product: ProductUpdate
   }
 }
 
-export async function getProductImage(authCreds: string, productID: number): Promise<Blob> {
+export async function getProductImage(productID: number): Promise<Blob> {
+  const creds = getCreds()
+  if (creds === null) {
+    throw new Error('User credentials not found!')
+  }
+
   const response = await fetch(API_URL + `/product/image/${productID}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'image/png',
-      Authorization: authCreds
+      Authorization: creds
     }
   })
   if (!response.ok) {

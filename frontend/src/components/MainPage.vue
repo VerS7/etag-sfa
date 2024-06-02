@@ -47,7 +47,7 @@
               variant="text"
               @click="
                 () => {
-                  userLogout()
+                  logout()
                   router.push({ path: '/login' })
                 }
               "
@@ -64,18 +64,15 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { ref } from 'vue'
 
-import { getUser, getUserCreds, userLogout } from '@/user'
-import type { UserResponse } from '@/apiFetch'
+import { useUser } from '@/user'
 
 const router = useRouter()
 
-const user = ref<UserResponse | null>(getUser())
-const userCreds: string | null = getUserCreds()
+const { user, check, logout } = useUser()
 
-if (!userCreds) {
+if (!check()) {
   router.push({ path: '/login' })
 }
-router.push({ path: '/products' })
+router.push({ path: '/' })
 </script>

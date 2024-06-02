@@ -112,7 +112,7 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { ref, type Ref } from 'vue'
 
 import ItemEditForm from './ItemEditForm.vue'
 import ItemDeleteForm from './ItemDeleteForm.vue'
@@ -120,16 +120,17 @@ import ItemCreateForm from './ItemCreateForm.vue'
 import ItemForm from './ItemForm.vue'
 
 import { fetchProducts, putUpdatedProduct, deleteProductByID, createNewProduct } from '@/apiFetch'
+import { useUser } from '@/user'
 import { formatDate } from '@/format'
 import type { Product, ProductUpdate } from '@/apiFetch'
 
 const router = useRouter()
-const userCreds: string | null = localStorage.getItem('userAuthCreds')
+const { getCreds } = useUser()
 
 const search = ref<string>()
 
 type itemAction = 'creatable' | 'deletable' | 'editable' | 'showable'
-const itemRefs: { [key: string] } = {
+const itemRefs: { [key: string]: Ref } = {
   creatable: ref<Product | null>(null),
   showable: ref<Product | null>(null),
   editable: ref<Product | null>(null),
@@ -180,8 +181,8 @@ function createEmptyProduct(): ProductUpdate {
   return {
     name: '',
     barcode: '',
-    price: 0,
-    sale_price: 0,
+    price: '0',
+    sale_price: '0',
     category: '',
     subcategory: '',
     unit: '',
@@ -214,13 +215,13 @@ function pageText(): string {
 }
 
 async function createProduct(product: ProductUpdate) {
-  if (userCreds === null) {
+  if (getCreds() === null) {
     router.push({ path: '/login' })
     return
   }
 
   try {
-    createNewProduct(userCreds, product)
+    createNewProduct(product)
   } catch {
     return
   }
@@ -232,13 +233,13 @@ async function createProduct(product: ProductUpdate) {
 }
 
 async function updateProduct(product: ProductUpdate, productID: number) {
-  if (userCreds === null) {
+  if (getCreds() === null) {
     router.push({ path: '/login' })
     return
   }
 
   try {
-    putUpdatedProduct(userCreds, product, productID)
+    putUpdatedProduct(product, productID)
   } catch {
     return
   }
@@ -250,12 +251,12 @@ async function updateProduct(product: ProductUpdate, productID: number) {
 }
 
 async function deleteProduct(productID: number) {
-  if (userCreds === null) {
+  if (getCreds() === null) {
     router.push({ path: '/login' })
     return
   }
   try {
-    deleteProductByID(userCreds, productID)
+    deleteProductByID(productID)
   } catch {
     return
   }
@@ -267,7 +268,7 @@ async function deleteProduct(productID: number) {
 }
 
 async function loadItems(options: paginationOptions) {
-  if (userCreds === null) {
+  if (getCreds() === null) {
     router.push({ path: '/login' })
     return
   }
@@ -277,7 +278,7 @@ async function loadItems(options: paginationOptions) {
   loading.value = true
 
   try {
-    productPage = await fetchProducts(userCreds, options.page, options.itemsPerPage)
+    productPage = await fetchProducts(options.page, options.itemsPerPage)
   } catch {
     loading.value = false
     return
