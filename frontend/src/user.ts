@@ -6,6 +6,8 @@ export function useUser(userData: User | null = null) {
   const user = ref<UserResponse | null>(null)
   if (userData) {
     login(userData)
+  } else {
+    user.value = getUser()
   }
 
   async function login(userData: User): Promise<void> {
@@ -45,8 +47,7 @@ async function userLogin(userData: User): Promise<UserResponse | null> {
     }
     throw error
   }
-
-  if (userResponse) {
+  if (userResponse !== null) {
     setUser(userCreds, userResponse)
     return userResponse
   }
