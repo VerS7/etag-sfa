@@ -3,7 +3,14 @@ import type { Product, ProductUpdate } from './apiFetch'
 export function formatProduct(product: Product | ProductUpdate): ProductUpdate {
   return {
     ...product,
-    price: typeof product.price === 'string' ? parseFloat(product.price) : product.price
+    price:
+      typeof product.price === 'string'
+        ? parseFloat(product.price).toFixed(2).toString()
+        : product.price,
+    sale_price:
+      typeof product.sale_price === 'string'
+        ? parseFloat(product.sale_price).toFixed(2).toString()
+        : product.sale_price
   }
 }
 
