@@ -97,7 +97,7 @@ async function loadProductImage(option: string | null) {
   if (!userCreds || !option) {
     return
   }
-  const image = await getProductImage(userCreds, props.item.id)
+  const image = await getProductImage(props.item.id)
   imageURL.value = URL.createObjectURL(image)
 }
 </script>
