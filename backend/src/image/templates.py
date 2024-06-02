@@ -45,13 +45,13 @@ class DefaultImage(BaseImageTemplate):
 
         bg_image = Image.open(self.bg_image)
         draw = ImageDraw.Draw(bg_image)
-        # Единица измерения
-        draw.text(text=f"{data.price:.2f}",
+        # Цена
+        draw.text(text=f"{float(data.price):.2f}",
                   font=self.price_font,
                   xy=(bg_image.size[0] / 2, 450),
                   fill=self.text_color,
                   anchor="mm")
-        # Цена продукта
+        # Единица измерения
         draw.text(text=f"{data.unit if '.' in data.unit else f'{data.unit}.'}",
                   font=self.info_font,
                   xy=(90, 335),
