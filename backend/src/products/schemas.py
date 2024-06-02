@@ -1,7 +1,6 @@
 """
 Product schemas
 """
-from decimal import Decimal
 from datetime import datetime
 
 from pydantic import BaseModel
@@ -11,8 +10,8 @@ class ProductBase(BaseModel):
     """Base product schema"""
     name: str
     barcode: str
-    price: Decimal
-    sale_price: Decimal | None
+    price: str
+    sale_price: str | None
     category: str | None
     subcategory: str | None
     brand: str | None
@@ -34,7 +33,7 @@ class ProductUpdate(ProductCreate):
 class ProductUpdatePartial(ProductBase):
     """Partial update product schema"""
     name: str | None
-    price: Decimal | None
+    price: str | None
     barcode: str | None
 
 
