@@ -12,7 +12,7 @@ from backend.src.token_auth.security import token_auth
 from backend.src.image.generating import generate_image
 
 from .. import crud
-from ..schemas import Product, ProductCreate
+from ..schemas import Product, ProductCreate, ProductUpdatePartial
 
 
 router = APIRouter(dependencies=[Depends(token_auth)], tags=["Token Access"])
@@ -54,3 +54,19 @@ async def get_product_image(product_id: int,
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                         detail="Product not found!")
+
+
+@router.put("/{token}/{product_id}/")
+async def update_product_partial(product_id: int,
+                                 product_update: ProductUpdatePartial,
+                                 session: AsyncSession = Depends(get_session)):
+    """update product endpoint"""
+    product = await crud.get_product(session, product_id)
+    if product is not None:
+        return await crud.update_product(
+            session,
+            product,
+            product_update,
+            partial=True
+        )
+    return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
