@@ -48,6 +48,12 @@ export interface ProductPage {
   pages: number | null
 }
 
+export interface AccessToken {
+  id: number
+  name: string
+  token: string
+}
+
 const API_URL: string = 'http://127.0.0.1:8000/api'
 
 const { getCreds } = useUser()
@@ -163,4 +169,23 @@ export async function getProductImage(productID: number): Promise<Blob> {
     throw { error: new Error(`${response.statusText}`), code: response.status }
   }
   return response.blob()
+}
+
+export async function fetchAccessTokens(): Promise<Array<AccessToken>> {
+  const creds = getCreds()
+  if (creds === null) {
+    throw new Error('User credentials not found!')
+  }
+
+  const response = await fetch(API_URL + `/token`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: creds
+    }
+  })
+  if (!response.ok) {
+    throw { error: new Error(`${response.statusText}`), code: response.status }
+  }
+  return response.json()
 }
