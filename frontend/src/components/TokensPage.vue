@@ -1,5 +1,16 @@
 <template>
   <v-container>
+    <template v-if="isLoading">
+      <v-row align="center" justify="center" class="mt-2 mb-2">
+        <v-progress-circular indeterminate :size="50" :width="4"> </v-progress-circular>
+      </v-row>
+      <v-row align="center" justify="center" class="mt-2"> Загрузка данных </v-row>
+    </template>
+    <template v-if="isError">
+      <v-row align="center" justify="center" class="mt-2 text-h6">
+        Не удалось загрузить данные
+      </v-row>
+    </template>
     <template v-for="token of tokens" :key="token.id">
       <v-card class="mb-2 mx-auto" elevation="3" max-width="800">
         <v-row class="pa-5" align="center">
@@ -43,6 +54,8 @@ const router = useRouter()
 const { getCreds } = useUser()
 
 const tokens = ref<Array<AccessToken> | null>(null)
+const isLoading = ref<boolean>(true)
+const isError = ref<boolean>(false)
 
 const tooltipText = ref<string>('Скопировать')
 
@@ -51,6 +64,7 @@ onMounted(() => {
 })
 
 async function loadTokens() {
+  isLoading.value = true
   if (getCreds() === null) {
     router.push({ path: '/login' })
     return
@@ -59,8 +73,9 @@ async function loadTokens() {
   try {
     tokens.value = await fetchAccessTokens()
   } catch {
-    return
+    isError.value = true
   }
+  isLoading.value = false
 }
 
 async function copyToken(token: string) {
