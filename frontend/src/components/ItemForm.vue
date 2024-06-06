@@ -83,18 +83,20 @@
 import { getProductImage, type Product } from '@/apiFetch'
 import { ref } from 'vue'
 
+import { useUser } from '@/user'
+
+const { check } = useUser()
+
 const props = defineProps<{
   item: Product
 }>()
-
-const userCreds: string | null = localStorage.getItem('userAuthCreds')
 
 const imageOptions = ref<[string]>(['default'])
 const imageURL = ref<string | null>(null)
 const selectedOption = ref<string | null>(null)
 
 async function loadProductImage(option: string | null) {
-  if (!userCreds || !option) {
+  if (!check() || !option) {
     return
   }
   const image = await getProductImage(props.item.id)
