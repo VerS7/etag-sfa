@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlmodel import select
 
-from backend.src.models.product import Product
+from models.product import Product
 from .schemas import ProductCreate, ProductUpdate, ProductUpdatePartial
 
 

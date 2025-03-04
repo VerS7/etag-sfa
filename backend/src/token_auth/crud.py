@@ -4,12 +4,13 @@ Read
 Update
 Delete
 """
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlmodel import select
 
-from backend.src.models.token import AuthToken
-from backend.src.crypto import hash_func
+from models.token import AuthToken
+from crypto import hash_func
 
 
 async def create_token(session: AsyncSession, name: str) -> AuthToken:
@@ -33,7 +34,9 @@ async def get_token(session: AsyncSession, name: str) -> AuthToken:
 
 async def verify_token(session: AsyncSession, token: str) -> AuthToken | None:
     """Verify token by token string"""
-    verified_token = await session.execute(select(AuthToken).where(AuthToken.token == token))
+    verified_token = await session.execute(
+        select(AuthToken).where(AuthToken.token == token)
+    )
     return verified_token.scalar()
 
 

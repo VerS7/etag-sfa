@@ -1,6 +1,7 @@
 """
 Product models
 """
+
 from datetime import datetime
 
 from sqlmodel import SQLModel, Field, Column
@@ -10,6 +11,7 @@ from sqlalchemy import DateTime
 
 class Product(SQLModel, table=True):
     """Product model"""
+
     __tablename__ = "products"
     id: int = Field(primary_key=True, index=True)
     name: str = Field()
@@ -22,5 +24,9 @@ class Product(SQLModel, table=True):
     unit: str | None = Field(default="шт", nullable=True)
     producer: str | None = Field(nullable=True)
     producer_country: str | None = Field(nullable=True)
-    created_at: datetime | None = Field(sa_column=Column(DateTime(timezone=True), default=datetime.utcnow()))
-    updated_at: datetime | None = Field(sa_column=Column(DateTime(timezone=True), onupdate=datetime.utcnow()))
+    created_at: datetime | None = Field(
+        sa_column=Column(DateTime(timezone=True), default=datetime.utcnow())
+    )
+    updated_at: datetime | None = Field(
+        sa_column=Column(DateTime(timezone=True), onupdate=datetime.utcnow())
+    )

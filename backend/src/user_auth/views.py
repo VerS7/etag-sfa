@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBasicCredentials
 
-from backend.src.database.db import get_session
-from backend.src.models.user import User
+from database.db import get_session
+from models.user import User
 from . import crud
 from .security import auth_credentials
 

@@ -1,13 +1,16 @@
 """
 Database
 """
+
+from typing import AsyncGenerator
+
 from sqlmodel import SQLModel
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from backend.src.constants import DB_CONN
-from backend.src.admin import init_admin
+from constants import DB_CONN
+from admin import init_admin
 
 
 engine = create_async_engine(DB_CONN, echo=False, future=True)
@@ -22,8 +25,10 @@ async def init_database() -> None:
         await init_admin(session)
 
 
-async def get_session() -> AsyncSession:
+async def get_session() -> AsyncGenerator[AsyncSession]:
     """Yields db session"""
-    async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+    async_session = async_sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False
+    )
     async with async_session() as session:
         yield session

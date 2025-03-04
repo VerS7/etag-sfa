@@ -1,6 +1,7 @@
 """
 Product data generating
 """
+
 from typing import Callable, Iterator
 from decimal import Decimal
 from random import random
@@ -10,12 +11,15 @@ from .schema import Product, CompletedProduct
 
 class ProductBuilder:
     """Product data builder"""
-    def __init__(self,
-                 data: list[dict],
-                 barcode_generator: Callable[[], str],
-                 price_multiplier: float,
-                 sale_chance: float,
-                 sale_multiplier: float):
+
+    def __init__(
+        self,
+        data: list[dict],
+        barcode_generator: Callable[[], str],
+        price_multiplier: float,
+        sale_chance: float,
+        sale_multiplier: float,
+    ):
         self._brg = barcode_generator
         self._pm = price_multiplier
         self._sc = sale_chance
@@ -46,7 +50,9 @@ class ProductBuilder:
             raise ValueError(f"{self._sm} is incorrect.")
 
         if random() < self._sc:
-            return str((min_price - (min_price * Decimal(self._sm))).quantize(Decimal("1.00")))
+            return str(
+                (min_price - (min_price * Decimal(self._sm))).quantize(Decimal("1.00"))
+            )
         return None
 
     def _generate(self, schema):
@@ -56,8 +62,12 @@ class ProductBuilder:
                     name=item["наименование"],
                     info=item["дополнительная информация"],
                     brand=item["бренд"],
-                    producer=item["изготовитель"] if "изготовитель" in item.keys() else "Россия",
-                    subcategory=item["подкатегория"] if "подкатегория" in item.keys() else None
+                    producer=item["изготовитель"]
+                    if "изготовитель" in item.keys()
+                    else "Россия",
+                    subcategory=item["подкатегория"]
+                    if "подкатегория" in item.keys()
+                    else None,
                 )
             if schema is CompletedProduct:
                 return schema(
@@ -68,10 +78,18 @@ class ProductBuilder:
                     name=item["наименование"],
                     info=item["дополнительная информация"],
                     brand=item["бренд"],
-                    producer_country=item["страна"] if "страна" in item.keys() else "Россия",
-                    unit=item["единицы измерения"] if "единицы измерения" in item.keys() else "шт",
-                    producer=item["изготовитель"] if "изготовитель" in item.keys() else None,
-                    subcategory=item["подкатегория"] if "подкатегория" in item.keys() else None
+                    producer_country=item["страна"]
+                    if "страна" in item.keys()
+                    else "Россия",
+                    unit=item["единицы измерения"]
+                    if "единицы измерения" in item.keys()
+                    else "шт",
+                    producer=item["изготовитель"]
+                    if "изготовитель" in item.keys()
+                    else None,
+                    subcategory=item["подкатегория"]
+                    if "подкатегория" in item.keys()
+                    else None,
                 )
 
     def generate_completed_product(self) -> Iterator[CompletedProduct]:

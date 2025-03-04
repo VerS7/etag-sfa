@@ -1,6 +1,7 @@
 """
 Constants
 """
+
 from os import getenv, path
 
 

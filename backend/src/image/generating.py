@@ -1,14 +1,13 @@
 """
 Product image generating
 """
-from backend.src.models.product import Product
+
+from models.product import Product
 
 from .templates import DefaultImage
 
 
-TEMPLATES = {
-    "default": DefaultImage()
-}
+TEMPLATES = {"default": DefaultImage()}
 
 
 async def generate_image(template: str, data: Product, **kwargs) -> bytes:

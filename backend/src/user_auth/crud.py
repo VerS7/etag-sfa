@@ -4,14 +4,15 @@ Read
 Update
 Delete
 """
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlmodel import select
 
 from fastapi.security import HTTPBasicCredentials
 
-from backend.src.crypto import hash_password
-from backend.src.models.user import User
+from crypto import hash_password
+from models.user import User
 
 
 async def get_users(session: AsyncSession) -> list[User]:
@@ -29,12 +30,16 @@ async def get_user(session: AsyncSession, username: str) -> User | None:
 
 async def add_user(session: AsyncSession, user: HTTPBasicCredentials) -> User:
     """add user by schema"""
-    existing_user = await session.execute(select(User).where(User.username == user.username))
+    existing_user = await session.execute(
+        select(User).where(User.username == user.username)
+    )
 
     if existing_user.scalars().first():
         raise ValueError("User with this username already exists!")
 
-    new_user = User(username=user.username, hashed_password=hash_password(user.password))
+    new_user = User(
+        username=user.username, hashed_password=hash_password(user.password)
+    )
     session.add(new_user)
     await session.commit()
     await session.refresh(new_user)
@@ -42,7 +47,9 @@ async def add_user(session: AsyncSession, user: HTTPBasicCredentials) -> User:
     return new_user
 
 
-async def update_user(session: AsyncSession, user: User, user_update: HTTPBasicCredentials) -> User:
+async def update_user(
+    session: AsyncSession, user: User, user_update: HTTPBasicCredentials
+) -> User:
     """update user"""
     pass
 

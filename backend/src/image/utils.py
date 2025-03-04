@@ -1,6 +1,7 @@
 """
 Image generating utility functions
 """
+
 import re
 import textwrap
 
@@ -23,10 +24,17 @@ def validate_img_scale(scale: float) -> bool:
     return scale >= 0
 
 
-def draw_justified_text(draw: ImageDraw, text: str, font: ImageFont,
-                        xy: tuple[int, int], fill: tuple[int, int, int],
-                        anchor: str, line_width: int, margin: int = 10,
-                        reverse: bool = False) -> None:
+def draw_justified_text(
+    draw: ImageDraw,
+    text: str,
+    font: ImageFont,
+    xy: tuple[int, int],
+    fill: tuple[int, int, int],
+    anchor: str,
+    line_width: int,
+    margin: int = 10,
+    reverse: bool = False,
+) -> None:
     """Draw justified text by line width in chars and margin"""
     x, y, x1, y1 = draw.textbbox(text=text, font=font, xy=xy)
     text_height = abs(y - y1)
@@ -35,7 +43,19 @@ def draw_justified_text(draw: ImageDraw, text: str, font: ImageFont,
 
     if reverse:
         for i, line in enumerate(lines[::-1]):
-            draw.text((xy[0], xy[1] - (i * (text_height + margin))), line, font=font, fill=fill, anchor=anchor)
+            draw.text(
+                (xy[0], xy[1] - (i * (text_height + margin))),
+                line,
+                font=font,
+                fill=fill,
+                anchor=anchor,
+            )
     else:
         for i, line in enumerate(lines):
-            draw.text((xy[0], xy[1] + (i * (text_height + margin))), line, font=font, fill=fill, anchor=anchor)
+            draw.text(
+                (xy[0], xy[1] + (i * (text_height + margin))),
+                line,
+                font=font,
+                fill=fill,
+                anchor=anchor,
+            )
