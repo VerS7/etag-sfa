@@ -4,6 +4,7 @@ Read
 Update
 Delete
 """
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlmodel import select
@@ -33,11 +34,12 @@ async def add_product(session: AsyncSession, product: ProductCreate) -> Product:
     return product
 
 
-async def update_product(session: AsyncSession,
-                         product: Product,
-                         product_update: ProductUpdate | ProductUpdatePartial,
-                         partial: bool = False
-                         ) -> Product:
+async def update_product(
+    session: AsyncSession,
+    product: Product,
+    product_update: ProductUpdate | ProductUpdatePartial,
+    partial: bool = False,
+) -> Product:
     """update product"""
     for name, value in product_update.model_dump(exclude_unset=partial).items():
         setattr(product, name, value)

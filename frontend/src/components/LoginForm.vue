@@ -7,7 +7,7 @@
         <div class="text-subtitle-1 text-medium-emphasis">Имя пользователя</div>
         <v-text-field
           v-model="username"
-          :rules="[(v) => !!v || 'Отсутствует имя пользователя.']"
+          :rules="[(v: string) => !!v || 'Отсутствует имя пользователя.']"
           density="compact"
           placeholder="Введите имя пользователя"
           variant="outlined"
@@ -19,7 +19,7 @@
           :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-closed'"
           :type="visible ? 'text' : 'password'"
           v-model="password"
-          :rules="[(v) => !!v || 'Отсутствует пароль.']"
+          :rules="[(v: string) => !!v || 'Отсутствует пароль.']"
           density="compact"
           placeholder="Введите пароль"
           variant="outlined"

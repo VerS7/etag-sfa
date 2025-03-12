@@ -4,8 +4,6 @@ Main
 
 from contextlib import asynccontextmanager
 
-import uvicorn
-
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -57,4 +55,6 @@ add_pagination(app)
 disable_installed_extensions_check()
 
 if __name__ == "__main__":
-    uvicorn.run(app="main:app")
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=3000)

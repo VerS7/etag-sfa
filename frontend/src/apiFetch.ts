@@ -54,7 +54,7 @@ export interface AccessToken {
   token: string
 }
 
-const API_URL: string = 'http://127.0.0.1:8000/api'
+const API_URL: string = import.meta.env.API_URL
 
 const { getCreds } = useUser()
 

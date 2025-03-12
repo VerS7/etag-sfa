@@ -1,6 +1,7 @@
 """
 Views
 """
+
 from fastapi import APIRouter
 
 from .custom_views.user_access_views import router as user_router

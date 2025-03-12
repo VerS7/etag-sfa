@@ -1,7 +1,9 @@
 """
 Simple script for adding mock data to app API
 """
-import os.path
+
+import os
+import time
 from random import choice, randint
 from os import getenv
 
@@ -24,7 +26,7 @@ builder = ProductBuilder(
     barcode_generator=lambda: choice(random_barcodes),
     price_multiplier=1.3,
     sale_chance=0.4,
-    sale_multiplier=0.2
+    sale_multiplier=0.2,
 )
 
 with requests.Session() as session:
@@ -33,16 +35,19 @@ with requests.Session() as session:
             product = list(builder.generate_completed_product())[0]
             print(f"POST | {str(product)[:70]}... | ", end="")
 
-            response = requests.post(api_url, data=product.model_dump_json().encode("utf-8"))
+            response = requests.post(
+                api_url, data=product.model_dump_json().encode("utf-8")
+            )
 
             if response.status_code == 401:
-                print(f"FAIL! 401 Unauthorised!")
+                print("FAIL! 401 Unauthorised!")
                 continue
 
             print("SUCCESS!")
+            time.sleep(0.2)
 
         except requests.exceptions.ConnectionError:
-            print(f"FAIL!\n")
+            print("FAIL!\n")
             exit()
 
         except KeyboardInterrupt:

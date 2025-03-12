@@ -1,6 +1,7 @@
 """
 Product schemas
 """
+
 from datetime import datetime
 
 from pydantic import BaseModel
@@ -8,6 +9,7 @@ from pydantic import BaseModel
 
 class ProductBase(BaseModel):
     """Base product schema"""
+
     name: str
     barcode: str
     price: str
@@ -22,16 +24,19 @@ class ProductBase(BaseModel):
 
 class ProductCreate(ProductBase):
     """Create product schema"""
+
     pass
 
 
 class ProductUpdate(ProductCreate):
     """Update product schema"""
+
     pass
 
 
 class ProductUpdatePartial(ProductBase):
     """Partial update product schema"""
+
     name: str | None
     price: str | None
     barcode: str | None
@@ -39,6 +44,7 @@ class ProductUpdatePartial(ProductBase):
 
 class Product(ProductBase):
     """Product schema"""
+
     id: int
     created_at: datetime
     updated_at: None | datetime

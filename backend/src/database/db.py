@@ -2,7 +2,7 @@
 Database
 """
 
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Any
 
 from sqlmodel import SQLModel
 
@@ -25,7 +25,7 @@ async def init_database() -> None:
         await init_admin(session)
 
 
-async def get_session() -> AsyncGenerator[AsyncSession]:
+async def get_session() -> AsyncGenerator[AsyncSession, Any]:
     """Yields db session"""
     async_session = async_sessionmaker(
         engine, class_=AsyncSession, expire_on_commit=False
